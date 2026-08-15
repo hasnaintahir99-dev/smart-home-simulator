@@ -62,12 +62,12 @@ Built as a **university-level C++ project** demonstrating:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                  SMART HOME SYSTEM CORE                      │
+│                  SMART HOME SYSTEM CORE                     │
 ├─────────────────────────────────────────────────────────────┤
-│                                                              │
-│   USER INPUT                                                 │
-│       │                                                      │
-│       ▼                                                      │
+│                                                             │
+│   USER INPUT                                                │
+│       │                                                     │
+│       ▼                                                     │
 │  ┌─────────────┐      ┌─────────────────────────────────┐   │
 │  │  MAIN MENU  │────▶ │        AUTOMATIC MODE           │   │
 │  │             │      │  • AI Presence Detection        │   │
@@ -86,21 +86,21 @@ Built as a **university-level C++ project** demonstrating:
 │                       │  • LCD / Fan / Lock Control     │   │
 │                       │  • Water Temp Override          │   │
 │                       └─────────────────────────────────┘   │
-│                                    │                         │
-│                                    ▼                         │
-│                    ┌───────────────────────────┐             │
-│                    │   2D MATRIX STATE ENGINE  │             │
-│                    │   int** house_matrix      │             │
-│                    │   [rooms][12 columns]     │             │
-│                    └───────────────────────────┘             │
-│                                    │                         │
-│                    ┌───────────────┴───────────┐             │
-│                    ▼                           ▼             │
+│                                    │                        │
+│                                    ▼                        │
+│                    ┌───────────────────────────┐            │
+│                    │   2D MATRIX STATE ENGINE  │            │
+│                    │   int** house_matrix      │            │
+│                    │   [rooms][12 columns]     │            │
+│                    └───────────────────────────┘            │
+│                                    │                        │
+│                    ┌───────────────┴───────────┐            │
+│                    ▼                           ▼            │
 │         ┌─────────────────┐       ┌──────────────────┐      │
 │         │  LIVE DASHBOARD │       │   FILE SAVE I/O  │      │
 │         │  (Terminal UI)  │       │ home_config.txt  │      │
 │         └─────────────────┘       └──────────────────┘      │
-│                                                              │
+│                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -175,29 +175,52 @@ Total Rooms → User-defined (minimum 3 required)
 
 ---
 
-## ▶️ How To Run
+## 🚀 How To Run
 
-### ✅ Requirements
-- Any C++ compiler → `g++`, `MSVC`, or `MinGW`
-- Terminal / Command Prompt / VS Code
+### 📋 Prerequisites
+Make sure you have a C++ compiler (`g++`) installed on your system.
 
-### 🐧 Linux / Mac
+- **Linux (Ubuntu / Mint / Debian):**
+  ```bash
+  sudo apt update && sudo apt install g++ build-essential
+
+```
+
+* **Windows:** Ensure [MinGW / GCC](https://www.msys2.org/) is installed and added to your System PATH.
+
+---
+
+### 🛠️ Compilation & Execution
+
+#### 🐧 Linux / macOS
+
 ```bash
-g++ -o smart_home smart_home.cpp
+# 1. Compile with C++11 standard
+g++ -std=c++11 smart_home.cpp -o smart_home
+
+# 2. Run the simulator
 ./smart_home
+
 ```
 
-### 🪟 Windows (MinGW / CMD)
-```bash
-g++ -o smart_home.exe smart_home.cpp
+#### 🪟 Windows (CMD / PowerShell / Git Bash)
+
+```cmd
+:: 1. Compile with C++11 standard
+g++ -std=c++11 smart_home.cpp -o smart_home.exe
+
+:: 2. Run the simulator
 smart_home.exe
+
 ```
 
-### 💻 VS Code
-```
-1. Open folder in VS Code
-2. Press Ctrl + Shift + B  →  Build
-3. Open Terminal  →  Run executable
+#### 💻 Visual Studio Code (Direct Run)
+
+1. Open the project folder in VS Code.
+2. Open `smart_home.cpp`.
+3. Click the **Play (▶ Run C/C++ File)** button in the top-right corner.
+4. Select **C/C++: g++ build and debug active file**.
+
 ```
 
 ### 🎮 First Run Example
