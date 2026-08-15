@@ -5,33 +5,37 @@
 ![Status](https://img.shields.io/badge/Status-Complete-brightgreen?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)
 
-> A fully functional terminal-based Smart Home System built in **C++**, simulating real-world home automation with AI logic, security engines, and live dashboard rendering — all inside the console.
+> A fully functional terminal-based Smart Home System built in **C++**, simulating
+> real-world home automation with AI logic, security engines, and live dashboard
+> rendering — all inside the console.
 
 ---
 
 ## 📌 Table of Contents
 - [About The Project](#-about-the-project)
 - [Features](#-features)
-- [Room Configuration & State Matrix](#-room-configuration--state-matrix)
-- [Core Logic & Rules Engine](#-core-logic--rules-engine)
+- [System Architecture](#-system-architecture)
+- [Room Configuration](#-room-configuration)
 - [How To Run](#-how-to-run)
 - [Project Structure](#-project-structure)
 - [Concepts Used](#-concepts-used)
-- [Live Terminal Dashboard Preview](#-live-terminal-dashboard-preview)
+- [Screenshots](#-screenshots)
 - [Author](#-author)
 
 ---
 
 ## 📖 About The Project
 
-This project simulates an integrated **Smart Home Management System** entirely within the terminal. It provides deep architectural control over an arbitrary number of rooms, handling dynamic telemetry data, environmental sensors, automated safety measures, and granular manual overrides.
+This project simulates a **Smart Home Management System** entirely in the terminal.  
+The user can configure multiple rooms, control devices (lights, AC, fans, cameras, locks),  
+and run either an **AI Automatic Mode** or a full **Manual Control Mode**.
 
-Built as an advanced **C++ Systems Project** demonstrating:
-- Dynamic Heap Memory Management with Raw Double Pointers
-- 2D Matrix-based State Tracking Engine
-- Amortized Array Resizing for Security Telemetry
-- File I/O for State Persistence
-- Real-time Column-Formatted Console Dashboard
+Built as a **university-level C++ project** demonstrating:
+- Dynamic Memory Management
+- 2D Matrix-based State Tracking
+- Pointer Manipulation
+- File I/O for Data Persistence
+- Real-time Dashboard Rendering
 
 ---
 
@@ -39,148 +43,283 @@ Built as an advanced **C++ Systems Project** demonstrating:
 
 | Feature | Description |
 |---|---|
-| 🤖 **AI Automatic Mode** | Automated sensor reaction engine controlling AC, fans, lights, and locks based on real-time presence. |
-| 🕹️ **Manual Control Mode** | Granular interactive CLI command terminal to override device states per room. |
-| 📊 **Live Telemetry Dashboard** | Formatted tabular display rendering continuous updates across all rooms and parameters. |
-| 🔒 **Critical Cyber/Hazard Shield** | Automated lockdown protocol and incident logging triggered when gas hazard ratio exceeds 80%. |
-| 💡 **Occupancy-Driven Lighting** | Intelligent light actuation tied directly to motion sensors and room occupancy state. |
-| ❄️ **Climate Control System** | Dynamic target temperature calibration and compressor switching based on thermal metrics. |
-| 🚿 **Dual-Zone Water Management** | Automated summer/winter water temperature adjustment exclusively for Kitchen and Bathroom. |
-| 📷 **Intruder Camera System** | Automatic camera activation upon detecting unidentified/unknown persons in active zones. |
-| 💾 **State Persistence** | Complete house matrix serialization to `home_config.txt` upon clean system exit. |
-| 🔧 **Hardware Maintenance Engine** | Built-in diagnostics and reset capabilities to restore offline or malfunctioning room controllers. |
+| 🤖 **AI Automatic Mode** | AI controls all devices based on room conditions |
+| 🕹️ **Manual Control Mode** | Full manual override for every device in every room |
+| 📊 **Live Dashboard** | Real-time terminal dashboard showing all room states |
+| 🔒 **Security Engine** | Auto-lockdown on gas leak detection (>80%) |
+| 💡 **Smart Lighting** | Auto ON/OFF based on room occupancy |
+| ❄️ **AC Automation** | Auto temperature control based on room temp |
+| 🚿 **Water Temp Control** | Smart hot/cold water for Kitchen & Bathroom |
+| 📷 **Camera System** | Auto-activates on unknown person detection |
+| 💾 **File Persistence** | Saves system state to `home_config.txt` |
+| 🔧 **Hardware Repair** | Repair broken rooms through manual command |
+| ⚠️ **Gas Hazard Detector** | Real-time hazard monitoring per room |
+| 📝 **Security Log** | Dynamic auto-growing log system for alerts |
 
 ---
 
-## 🏠 Room Configuration & State Matrix
-
-The house is modeled using a dynamic 2D array (`int** house_matrix`), where each row represents a distinct room and each column maps directly to a hardware actuator or sensor state:
-
-### State Column Mapping (`house_matrix[i][j]`)
-
-| Column Index | Identifier | Data Representation / Possible Values |
-|---|---|---|
-| `0` | `COL_PRESENCE` | `0`: Empty, `1`: Unknown Person, `2`: Owner |
-| `1` | `COL_LOCK` | `0`: Unlocked, `1`: Locked, `2`: Lockdown |
-| `2` | `COL_LIGHT` | `0`: OFF, `1`: ON |
-| `3` | `COL_AC_POWER` | `0`: OFF, `1`: ON |
-| `4` | `COL_AC_TARGET` | Target Temperature in Celsius (`16°C - 30°C`) |
-| `5` | `COL_TEMP` | Current Ambient Temperature in Celsius |
-| `6` | `COL_LCD` | `0`: OFF, `1`: ON, `2`: Muted |
-| `7` | `COL_HAZARD` | Environmental Hazard / Gas Leak (`0% - 100%`) |
-| `8` | `COL_CAMERA` | `0`: Standby, `1`: Recording |
-| `9` | `COL_STATUS` | `0`: Broken / Offline, `1`: Online |
-| `10` | `COL_WATER_TEMP`| Water Line Temperature in Celsius |
-| `11` | `COL_FAN` | `0`: OFF, `1`: ON |
-
-### Special Room Constraints
-- **Normal Rooms (Index `0` to `N-3`)**: Support full features (AC, Fan, LCD, Lights, Camera).
-- **Kitchen (Index `N-2`)**: LCD is hard-disabled (`N/A`). Water temperature control enabled.
-- **Bathroom (Index `N-1`)**: AC, Fan, LCD, and Cameras are restricted (`N/A`). Dedicated water temperature control enabled.
-
----
-
-## ⚙️ Core Logic & Rules Engine
-
-### 1. Safety & Hazard Protocol (Priority Override)
-- If `COL_HAZARD > 80%`:
-  - Room status set to **BROKEN** (`COL_STATUS = 0`).
-  - Door status set to **LOCKDOWN** (`COL_LOCK = 2`).
-  - Ventilation shut down (`COL_FAN = 0`).
-  - Incident appended to dynamic security audit log heap buffer.
-
-### 2. Automatic Presence & Surveillance Rules
-- **Owner Present (`2`)**: Unlocks doors, enables lights.
-- **Empty Room (`0`)**: Locks doors, turns off lights, fans, and LCD displays.
-- **Unknown Presence (`1`)**: Activates security cameras into **RECORDING** mode.
-
-### 3. Thermal Management
-- If `COL_TEMP >= 32°C`: AC turns **ON** and target sets to `22°C`.
-- If `COL_TEMP <= 24°C`: AC target relaxes to `26°C`.
-- If `COL_TEMP > 26°C`: Ventilation fans automatically turn **ON**.
-
----
-
-## 🚀 How To Run
-
-### Prerequisites
-- GCC / G++ compiler supporting **C++11** or higher.
-- Terminal / Command Prompt.
-
-### Compilation & Execution
-
-#### Linux / macOS
-```bash
-# 1. Compile source code
-g++ -std=c++11 main.cpp -o smart_home_sim
-
-# 2. Run executable
-./smart_home_sim
+## 🏗️ System Architecture
 
 ```
+┌─────────────────────────────────────────────────────────────┐
+│                  SMART HOME SYSTEM CORE                      │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│   USER INPUT                                                 │
+│       │                                                      │
+│       ▼                                                      │
+│  ┌─────────────┐      ┌─────────────────────────────────┐   │
+│  │  MAIN MENU  │────▶ │        AUTOMATIC MODE           │   │
+│  │             │      │  • AI Presence Detection        │   │
+│  │  1. Auto    │      │  • Smart AC Control             │   │
+│  │  2. Manual  │      │  • Auto Lighting                │   │
+│  │  3. Exit    │      │  • Camera Activation            │   │
+│  └─────────────┘      │  • Water Temp Management        │   │
+│       │               └─────────────────────────────────┘   │
+│       │               ┌─────────────────────────────────┐   │
+│       └─────────────▶ │         MANUAL MODE             │   │
+│                       │  • Light Control                │   │
+│                       │  • AC Adjustment                │   │
+│                       │  • Presence Override            │   │
+│                       │  • Hazard Simulation            │   │
+│                       │  • Hardware Repair              │   │
+│                       │  • LCD / Fan / Lock Control     │   │
+│                       │  • Water Temp Override          │   │
+│                       └─────────────────────────────────┘   │
+│                                    │                         │
+│                                    ▼                         │
+│                    ┌───────────────────────────┐             │
+│                    │   2D MATRIX STATE ENGINE  │             │
+│                    │   int** house_matrix      │             │
+│                    │   [rooms][12 columns]     │             │
+│                    └───────────────────────────┘             │
+│                                    │                         │
+│                    ┌───────────────┴───────────┐             │
+│                    ▼                           ▼             │
+│         ┌─────────────────┐       ┌──────────────────┐      │
+│         │  LIVE DASHBOARD │       │   FILE SAVE I/O  │      │
+│         │  (Terminal UI)  │       │ home_config.txt  │      │
+│         └─────────────────┘       └──────────────────┘      │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+```
 
-#### Windows (MinGW / Command Prompt / PowerShell)
+### 📦 2D Matrix Column Map
 
-```cmd
-:: 1. Compile source code
-g++ -std=c++11 main.cpp -o smart_home_sim.exe
+```
+house_matrix[room][column]
+│
+├── [0]  Presence     →  0=Empty      1=Unknown    2=Owner
+├── [1]  Lock         →  0=Unlocked   1=Locked     2=Lockdown
+├── [2]  Light        →  0=OFF        1=ON
+├── [3]  AC Power     →  0=OFF        1=ON
+├── [4]  AC Target    →  Temperature in °C
+├── [5]  Room Temp    →  Current temperature in °C
+├── [6]  LCD Screen   →  0=OFF        1=ON         2=MUTED
+├── [7]  Hazard       →  Gas leak percentage (0-100%)
+├── [8]  Camera       →  0=Standby    1=Recording
+├── [9]  Status       →  0=BROKEN     1=Online
+├── [10] Water Temp   →  Kitchen & Bathroom only (°C)
+└── [11] Fan          →  0=OFF        1=ON
+```
 
-:: 2. Run executable
-smart_home_sim.exe
+### ⚙️ Automation Engine Flow
 
+```
+runAutomationEngines() called every frame
+│
+├── STEP 1: HAZARD CHECK (Always runs first)
+│   └── if Hazard > 80%
+│       ├── Status   = BROKEN
+│       ├── Lock     = LOCKDOWN
+│       ├── Fan      = OFF
+│       ├── Light    = ON (Emergency)
+│       └── Log Alert added to Security Log
+│
+├── STEP 2: AUTO MODE RULES (if Automatic Mode ON)
+│   ├── Presence == Owner  → Lock = UNLOCKED
+│   ├── Presence == Empty  → Lock = LOCKED
+│   ├── Temp >= 32°C       → AC ON, Target = 22°C
+│   ├── Temp <= 24°C       → AC Target = 26°C
+│   ├── Presence == Empty  → Light OFF, Fan OFF, LCD OFF
+│   ├── Presence == Unknown → Camera = RECORDING
+│   └── Water Temp:
+│       ├── Temp <= 20°C   → Water = 40°C (Winter Mode)
+│       └── Temp >= 30°C   → Water = 20°C (Summer Mode)
+│
+└── STEP 3: ROOM-SPECIFIC RULES
+    ├── Bathroom  → No AC / No Fan / No LCD / No Camera
+    ├── Kitchen   → No LCD / Has Water Temp / Has Camera
+    └── Normal    → Full feature set enabled
+```
+
+---
+
+## 🏠 Room Configuration
+
+```
+Total Rooms → User-defined (minimum 3 required)
+
+┌────────────────────────────────────────────────────┐
+│  Room 1   │  User-defined name  │  Full control    │
+│  Room 2   │  User-defined name  │  Full control    │
+│    ...    │        ...          │      ...         │
+│  Room N-1 │  AUTO = Kitchen     │  No LCD          │
+│  Room N   │  AUTO = Bathroom    │  No AC/Fan/LCD   │
+└────────────────────────────────────────────────────┘
+```
+
+> ⚠️ Last room is **always Bathroom**.  
+> ⚠️ Second last room is **always Kitchen**.  
+> Both are auto-configured by the system — no manual naming needed.
+
+---
+
+## ▶️ How To Run
+
+### ✅ Requirements
+- Any C++ compiler → `g++`, `MSVC`, or `MinGW`
+- Terminal / Command Prompt / VS Code
+
+### 🐧 Linux / Mac
+```bash
+g++ -o smart_home smart_home.cpp
+./smart_home
+```
+
+### 🪟 Windows (MinGW / CMD)
+```bash
+g++ -o smart_home.exe smart_home.cpp
+smart_home.exe
+```
+
+### 💻 VS Code
+```
+1. Open folder in VS Code
+2. Press Ctrl + Shift + B  →  Build
+3. Open Terminal  →  Run executable
+```
+
+### 🎮 First Run Example
+```
+=== SMART HOME SYSTEM INSTALLATION ===
+Enter total number of rooms in the house: 4
+
+--- Room Configuration Engine ---
+Enter name for Room 1: Living Room
+Enter name for Room 2: Bedroom
+[System] Room 3 automatically configured as 'Kitchen'.
+[System] Room 4 automatically configured as 'Bathroom'.
 ```
 
 ---
 
 ## 📁 Project Structure
 
-```text
+```
 terminal-smart-home-simulator/
-├── main.cpp              # Core source code containing system engines, dashboard, and main loop
-├── .gitignore            # Ignores build artifacts, executables, and config files
-├── home_config.txt       # Auto-generated persistent matrix state file (generated at runtime)
-└── README.md             # Project documentation and specifications
-
+│
+├── 📄 smart_home.cpp        ←  Main source code (all logic inside)
+├── 📄 home_config.txt       ←  Auto-generated save file (after first run)
+├── 📄 README.md             ←  Project documentation (this file)
+├── 📄 LICENSE               ←  MIT License
+└── 📄 .gitignore            ←  C++ gitignore rules
 ```
 
 ---
 
 ## 🧠 Concepts Used
 
-* **Dynamic Memory Allocation**: Manual heap allocation using raw pointers (`new` and `delete[]`) for jagged 2D matrices and runtime-allocated string arrays.
-* **Pointer-by-Reference & Auto-Growing Arrays**: Dynamic doubling strategy ($O(1)$ amortized insertion) implemented in `addSecurityLog` to resize security event buffers without memory leaks.
-* **Defensive Resource Cleanup**: Comprehensive memory deallocation loops to ensure zero heap leaks upon process termination.
-* **Matrix-Based Telemetry**: Tabular data structure modeling real-world IoT hardware nodes.
-* **Formatted Stream Output**: Custom text-padding formatting engine for aligning CLI columns dynamically.
-* **File Serialization / Deserialization**: Low-level stream serialization for saving matrix states across application lifecycles.
+| Concept | Where Used |
+|---|---|
+| `int** house_matrix` | 2D dynamic array for all room states |
+| `new` / `delete[]` | Heap allocation and cleanup |
+| `string* &logs` | Pointer by reference — auto-growing log array |
+| `ofstream` | File I/O — saving system state to disk |
+| `getline()` | Safe string input for room names |
+| `switch-case` | Manual control command decoder |
+| `while` + `cin.clear()` | Input validation loops |
+| `continue` | Skip broken rooms in automation loop |
+| Modular Functions | 7 separate function blocks for clean design |
+
+### 🔍 Code Block Map
+
+```
+smart_home.cpp
+│
+├── BLOCK 1 → printPaddedText()       Text padding utility
+├── BLOCK 2 → addSecurityLog()        Dynamic log array manager
+├── BLOCK 3 → displayDashboard()      Live terminal UI renderer
+├── BLOCK 4 → setRealisticDefaults()  Startup state initializer
+├── BLOCK 5 → runAutomationEngines()  AI + Security logic core
+├── BLOCK 6 → saveSystemState()       File I/O persistence
+└── BLOCK 7 → main()                  Master control executive loop
+```
 
 ---
 
-## 📸 Live Terminal Dashboard Preview
+## 📸 Screenshots
 
-```text
+### 🖥️ Live Dashboard View
+```
 =============================================================================================================================
-||                                                SMART HOME LIVE DASHBOARD                                                ||
+||                                              SMART HOME LIVE DASHBOARD                                                  ||
 =============================================================================================================================
-ID  Room Name      Presence  Lock      Status  Light   Fan   AC Pwr  Temp/Trgt   LCD     Camera      Hazard  Water   
+ID  Room Name      Presence  Lock      Status  Light   Fan   AC Pwr  Temp/Trgt   LCD     Camera      Hazard  Water
 -----------------------------------------------------------------------------------------------------------------------------
-1   Master Bed     Owner     UNLOCKED  Online  ON      ON    ON      30C/22C     ON      Standby     0%      N/A     
-2   Living Room    Empty     LOCKED    Online  OFF     OFF   OFF     22C/0C      OFF     Standby     0%      N/A     
-3   Kitchen        Empty     LOCKED    Online  OFF     OFF   OFF     22C/0C      N/A     Standby     0%      25C     
-4   Bathroom       Owner     UNLOCKED  Online  ON      N/A   N/A     30C         N/A     N/A         0%      25C     
+1   Living Room    Owner     UNLOCKED  Online  ON      ON    ON      30C/22C     ON      Standby     0%      N/A
+2   Bedroom        Empty     LOCKED    Online  OFF     OFF   OFF     22C/0C      OFF     Standby     0%      N/A
+3   Kitchen        Owner     UNLOCKED  Online  ON      ON    ON      30C/22C     N/A     Standby     0%      25C
+4   Bathroom       Empty     LOCKED    Online  OFF     N/A   N/A     22C         N/A     N/A         0%      25C
 =============================================================================================================================
+```
 
+### 🎛️ Manual Control Terminal
+```
+--- MANUAL CONTROL TERMINAL ---
+1. Light Control       6. LCD Control
+2. AC Adjust           7. Door Lock Control
+3. Presence Adjust     8. Bathroom/Kitchen Water Temp
+4. Hazard Control      9. Fan Control
+5. Hardware Repair    10. Return to Main Menu
+Enter command:
+```
+
+### 🚨 Emergency Lockdown Trigger
+```
+[HAZARD DETECTED] Gas leak at 85% in Kitchen!
+EMERGENCY: High Gas Leak Alert! System Lockdown triggered.
+Status  → BROKEN
+Lock    → LOCKDOWN
+Fan     → OFF (prevent gas spread)
+Light   → ON  (emergency alert)
 ```
 
 ---
 
-## 👤 Author
+## 👨‍💻 Author
 
-**Hafiz Hasnain Tahir**
+**Hasnain Tahir**
 
-* **GitHub**: [@hasnaintahir99-dev](https://github.com/hasnaintahir99-dev)
-* **Domain**: Cyber Security & Software Development
+[![GitHub](https://img.shields.io/badge/GitHub-hasnaintahir99--dev-black?style=flat-square&logo=github)](https://github.com/hasnaintahir99-dev)
 
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License**.  
+See the [LICENSE](LICENSE) file for full details.
+
+---
+
+<div align="center">
+
+**⭐ If you found this project helpful, please give it a star! ⭐**
+
+*"Built with logic, powered by C++"* 🚀
+
+</div>
 ```
 
-```
+---
+
